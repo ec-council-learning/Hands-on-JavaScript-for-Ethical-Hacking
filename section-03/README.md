@@ -12,3 +12,4 @@
 | [client](CVE-2017-5941/vuln-app/client/) | React Web Application |
 | [server](CVE-2017-5941/vuln-app/server/) | Node.js Server |
 | [payload](CVE-2017-5941/vuln-app/payload/) | Exploit Payload Generator/Tester |
+| [patched server](CVE-2017-5941/vuln-app/server-patched/) | Patched Node.js Server |
