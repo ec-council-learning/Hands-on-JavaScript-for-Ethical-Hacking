@@ -26,3 +26,11 @@ for i in {1..10}; do dvwa-session;sleep 0.5; done
 ```sh
 date -d @UNIX_TIME
 ```
+
+# Video 4.5
+
+<details>
+  <summary>Spoiler: Solution for vuln-app</summary>
+
+    curl http://localhost:10003/api/topSecret -H 'Content-Type: application/json' -d '{"apiKey":"V2VsbERvbmVSZWNvZ25pemluZ0Jhc2U2NCEh"}'
+</details>

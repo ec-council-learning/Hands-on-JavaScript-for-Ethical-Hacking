@@ -61,7 +61,7 @@ class App extends React.Component {
     const requestOptions = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: this.state.inputName }),
+      body: JSON.stringify({ name: this.state.inputName, apiKey: 'V2VsbERvbmVSZWNvZ25pemluZ0Jhc2U2NCEh' }),
       credentials: 'include'
     };
 
