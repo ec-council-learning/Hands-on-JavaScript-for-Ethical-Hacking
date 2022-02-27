@@ -29,6 +29,10 @@ date -d @UNIX_TIME
 
 # Video 4.5
 
+```sh
+ffuf -u http://localhost:10003FUZZ -w /usr/share/seclists/Discovery/Web-Content/api/api-endpoints.txt
+```
+
 <details>
   <summary>Spoiler: Solution for vuln-app</summary>
 

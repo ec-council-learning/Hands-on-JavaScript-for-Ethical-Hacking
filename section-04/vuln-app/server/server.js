@@ -17,6 +17,7 @@ app.use(cors({
 }));
 
 const popularApiUrl = 'http://localhost:10003/api'
+const popularApiKey = 'V2VsbERvbmVSZWNvZ25pemluZ0Jhc2U2NCEh';
 
 popularApi.use(bodyParser.json());
 popularApi.use(cors({
@@ -36,7 +37,7 @@ app.post('/', function (req, res) {
             fetch(`${popularApiUrl}/profile`,
                 {
                     method: 'POST',
-                    body: JSON.stringify({ name: nameValue, apiKey: 'V2VsbERvbmVSZWNvZ25pemluZ0Jhc2U2NCEh' } ),
+                    body: JSON.stringify({ name: nameValue, apiKey: popularApiKey } ),
                     headers: { 'Content-Type': 'application/json' }
                 })
                 .then(apiRes => apiRes.json())
