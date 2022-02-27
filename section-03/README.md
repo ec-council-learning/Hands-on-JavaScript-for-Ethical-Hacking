@@ -6,17 +6,25 @@
 # Video 3.3
 
 * [About CVE Records](https://cve.mitre.org/cve/identifiers/index.html)
+* [`node-serialize`](https://www.npmjs.com/package/node-serialize)
 * [[NVD] CVE-2017-5941](https://nvd.nist.gov/vuln/detail/CVE-2017-5941)
 * [[Snyk] CVE-2017-5941](https://snyk.io/test/npm/node-serialize)
 
 # Video 3.4
 
 * [create-react-app](https://github.com/facebook/create-react-app)
+* [CyberChef](https://gchq.github.io/CyberChef/)
+* [Reverse Shell Generator](https://www.revshells.com/)
 
-# CVE-2017-5941
+## CVE-2017-5941
 | **#** | **Section Title** |
 | :---: | --- |
 | [client](CVE-2017-5941/vuln-app/client/) | React Web Application |
 | [server](CVE-2017-5941/vuln-app/server/) | Node.js Server |
 | [payload](CVE-2017-5941/vuln-app/payload/) | Exploit Payload Generator/Tester |
 | [patched server](CVE-2017-5941/vuln-app/server-patched/) | Patched Node.js Server |
+
+# Video 3.5
+
+* [`npm audit`](https://docs.npmjs.com/cli/v8/commands/npm-audit/)
+* [HttpOnly](https://owasp.org/www-community/HttpOnly)
