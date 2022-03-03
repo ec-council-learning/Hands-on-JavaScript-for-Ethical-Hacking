@@ -1,3 +1,7 @@
+# Video 4.2
+
+* [[OWASP] A07:2021 – Identification and Authentication Failures](https://owasp.org/Top10/A07_2021-Identification_and_Authentication_Failures/)
+
 # Video 4.3
 
 * [CWE-521: Weak Password Requirements](https://cwe.mitre.org/data/definitions/521.html)
