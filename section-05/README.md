@@ -28,3 +28,13 @@ npm audit | grep -B 1 -A 2 High
 
 * [Retire.js](https://github.com/RetireJS/retire.js)
 * [[OWASP] Vulnerability Disclosure Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Vulnerability_Disclosure_Cheat_Sheet.html)
+* [Snyk.io](https://snyk.io/)
+
+```sh
+sudo npm install -g snyk
+snyk auth
+snyk test
+
+#fancy dashboard
+snyk monitor
+```
