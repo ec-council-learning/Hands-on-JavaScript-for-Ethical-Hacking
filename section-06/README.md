@@ -9,6 +9,8 @@
 * [CWE-611: Improper Restriction of XML External Entity Reference](https://cwe.mitre.org/data/definitions/611.html)
 * [CWE-756: Missing Custom Error Page](https://cwe.mitre.org/data/definitions/756.html)
 
+# Video 6.4
+
 ```xml
 <?xml version="1.0" encoding="ISO-8859-1"?> 
 <!DOCTYPE foo [
