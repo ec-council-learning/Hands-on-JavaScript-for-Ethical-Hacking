@@ -13,6 +13,7 @@ header, footer {
 
 header {
     font-size: calc(15px + 2vmin);
+    line-height: calc(15px + 5vmin);
 }
 
 main{
@@ -37,4 +38,5 @@ a {
 
 span.highlight{
     color:chartreuse;
+    font-family:'Courier New', Courier, monospace;
 }

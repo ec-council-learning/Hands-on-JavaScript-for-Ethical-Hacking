@@ -1,14 +1,14 @@
 const express = require('express');
-const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const hardcore = require('hardcore');
 const fetch = require('node-fetch');
+const fs = require('fs');
 
 var app = express();
-var popularApi = express();
-
-app.use(cookieParser())
+app.use(require('cookie-parser')())
 app.use(bodyParser.json());
+app.use(require('express-xml-bodyparser')({ strict: false }));
 app.use(cors({
     origin: function (origin, callback) {
         callback(null, origin);
@@ -16,16 +16,14 @@ app.use(cors({
     credentials: true
 }));
 
+const xmlParseOptions = {
+    dereference: ({ path }) => {
+        return { entity: fetch(path) };
+    }
+};
+
 const popularApiUrl = 'http://localhost:10003/api'
 const popularApiKey = 'V2VsbERvbmVSZWNvZ25pemluZ0Jhc2U2NCEh';
-
-popularApi.use(bodyParser.json());
-popularApi.use(cors({
-    origin: function (origin, callback) {
-        callback(null, origin);
-    },
-    credentials: true
-}));
 
 app.post('/', function (req, res) {
     console.log(`/ [POST] -> {}`);
@@ -37,7 +35,7 @@ app.post('/', function (req, res) {
             fetch(`${popularApiUrl}/profile`,
                 {
                     method: 'POST',
-                    body: JSON.stringify({ name: nameValue, apiKey: popularApiKey } ),
+                    body: JSON.stringify({ name: nameValue, apiKey: popularApiKey }),
                     headers: { 'Content-Type': 'application/json' }
                 })
                 .then(apiRes => apiRes.json())
@@ -63,7 +61,7 @@ app.post('/changeProfile', function (req, res) {
     fetch(`${popularApiUrl}/profile`,
         {
             method: 'POST',
-            body: JSON.stringify(req.body),
+            body: JSON.stringify({ name: req.body.name, apiKey: popularApiKey }),
             headers: { 'Content-Type': 'application/json' }
         })
         .then(apiRes => apiRes.json())
@@ -73,11 +71,45 @@ app.post('/changeProfile', function (req, res) {
         });
 });
 
+app.post('/changelog', function (req, res, next) {
+    console.log(`/changelog [POST] -> ${JSON.stringify(req.body)}`);
+    hardcore.parse(req.rawBody, xmlParseOptions)
+        .then((doc) => {
+            var versions = doc.filterDeep((x) => x.name == 'Version').map(x => x[0]);
+            console.log(versions);
+            var changelist = [];
+            for (const v of versions) {
+                let vNumber = v.text;
+                data = fs.readFileSync(`changes/${vNumber}.html`, 'utf8').toString().replace(/\r?\n|\r/g, "");
+                changelist.push(data);
+            }
+
+            res.json(changelist);
+        });
+});
+
+app.listen(3003, function () {
+    console.log("server is running on port 3003");
+});
+
+
+//#region Popular API
+
+var popularApi = express();
+
+popularApi.use(bodyParser.json());
+popularApi.use(cors({
+    origin: function (origin, callback) {
+        callback(null, origin);
+    },
+    credentials: true
+}));
+
 popularApi.post('/api/profile', function (req, res) {
     //console.log(`[PopularApi]/api/profile [POST] -> ${JSON.stringify(req.body)}`);
     var body = req.body;
 
-    if(!validateApiKey(body.apiKey)){
+    if (!validateApiKey(body.apiKey)) {
         res.status(401).json({ name: "", startsWith: "", length: "" });
         return;
     }
@@ -95,10 +127,10 @@ popularApi.post('/api/profile', function (req, res) {
 });
 
 popularApi.post('/api/topSecret', function (req, res) {
-    if(validateApiKey(req.body.apiKey)){
+    if (validateApiKey(req.body.apiKey)) {
         res.send('\nCongratulations! You just used the hardcoded API key to exploit the OWASP A07:2021 vulnerability.');
     }
-    else{
+    else {
         // fake the 404 response
         res.status(404).send('<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<title>Error</title>\n</head>\n<body>\n<pre>Cannot POST /api/topSecret</pre>\n</body>\n</html>\n');
     }
@@ -126,18 +158,14 @@ popularApi.get('/api/info.json', function (req, res) {
     ]);
 });
 
-validateApiKey = function (apiKey){
+validateApiKey = function (apiKey) {
     return apiKey === 'V2VsbERvbmVSZWNvZ25pemluZ0Jhc2U2NCEh';
 }
-
-app.listen(3003, function () {
-    console.log("server is running on port 3003");
-});
 
 popularApi.listen(10003, function () {
     //run silently
 });
-
+//#endregion
 
 
 

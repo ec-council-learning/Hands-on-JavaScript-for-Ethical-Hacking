@@ -5,9 +5,11 @@
         "cookie-parser": "^1.4.6",
         "cors": "^2.8.5",
         "express": "^4.17.3",
+        "express-xml-bodyparser": "^0.3.0",
+        "hardcore": "^1.0.0",
         "node-fetch": "^2.6.7"
     },
     "scripts": {
-        "start": "node server.js"
+        "start": "cls && node server.js"
     }
 }
