@@ -21,6 +21,7 @@ class ChangelogModal extends React.Component {
   }
 
   componentDidMount() {
+    //Removed the redundant http calls! /Joe
     const requestOptions = {
       method: 'POST',
       headers: { 'Content-Type': 'application/xml' },

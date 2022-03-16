@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const hardcore = require('hardcore');
 const fetch = require('node-fetch');
+const fetchSync = require('sync-fetch');
 const fs = require('fs');
 
 var app = express();
@@ -18,7 +19,7 @@ app.use(cors({
 
 const xmlParseOptions = {
     dereference: ({ path }) => {
-        return { entity: fetch(path) };
+        return { entity: fetchSync(path).text() };
     }
 };
 
@@ -76,7 +77,6 @@ app.post('/changelog', function (req, res, next) {
     hardcore.parse(req.rawBody, xmlParseOptions)
         .then((doc) => {
             var versions = doc.filterDeep((x) => x.name == 'Version').map(x => x[0]);
-            console.log(versions);
             var changelist = [];
             for (const v of versions) {
                 let vNumber = v.text;
