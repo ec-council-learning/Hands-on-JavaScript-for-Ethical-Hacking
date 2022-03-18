@@ -9,11 +9,28 @@
 * [CWE-611: Improper Restriction of XML External Entity Reference](https://cwe.mitre.org/data/definitions/611.html)
 * [CWE-756: Missing Custom Error Page](https://cwe.mitre.org/data/definitions/756.html)
 
+```xml
+<?xml version="1.0"  encoding="UTF-8" ?>
+<!DOCTYPE Wares [
+  <!ENTITY ltd "Limited Edition ™">
+]>
+<Wares>
+  <Item>Most Beautiful Apple (&ltd;)</Item>
+  <Item>Highest Possible Mountain (&ltd;)</Item>
+  <Item>Deepest Darkest Cave (&ltd;)</Item>
+</Wares>
+```
+
+```sh
+# Load unsafe.yml that enables XXE challenge
+# https://github.com/juice-shop/juice-shop/tree/master/config
+sudo docker run --rm -it -e "NODE_ENV=unsafe" -d -p 127.0.0.1:3000:3000 bkimminich/juice-shop
+```
+
 # Video 6.4
 
 * [Canarytokens](https://canarytokens.org/)
 * [Webhook.site](https://webhook.site/)
-
 
 ## Different payloads
 
