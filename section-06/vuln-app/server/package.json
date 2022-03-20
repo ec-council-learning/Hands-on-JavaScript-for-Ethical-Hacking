@@ -11,6 +11,6 @@
         "sync-fetch": "^0.3.1"
     },
     "scripts": {
-        "start": "cls && node server.js"
+        "start": "node server.js"
     }
 }

