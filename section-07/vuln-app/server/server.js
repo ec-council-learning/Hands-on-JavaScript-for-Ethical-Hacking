@@ -20,6 +20,9 @@ app.use(cors({
 const popularApiUrl = 'http://localhost:10003/api'
 const popularApiKey = 'V2VsbERvbmVSZWNvZ25pemluZ0Jhc2U2NCEh';
 const adminId = uuid.v4();
+var feedbackStore = [
+    'eyAidGltZSI6ICIyMDIyLTAzLTI2IiwgIndobyI6ICJKb2UiLCAiYm9keSI6ICJUZXN0aW5nIGZlZWRiYWNrIGZvcm0uIEkgcmVhbGx5IGxpa2VkIGl0LCBlc3BlY2lhbGx5IGhvdyBib29sZXRwcm9vZiBJIG1hZGUgaXQiIH0='
+];
 
 app.post('/', function (req, res) {
     console.log(`/ [POST] -> {}`);
@@ -88,6 +91,24 @@ app.post('/isAdmin', function (req, res, next) {
         console.log(`Current admin ID: ${adminId}`);
         res.status(401).send();
     }
+});
+
+app.get('/feedbacks', function (req, res) {
+    console.log(`/feedbacks [POST] -> {}`);
+
+    if (req.cookies.whoami !== adminId) {
+        res.status(401).json([]);
+        return;
+    }
+
+    res.json(feedbackStore);
+});
+
+app.post('/newFeedback', function (req, res, next) {
+    console.log(`/newFeedback [POST] -> ${JSON.stringify(req.body)}`);
+
+    feedbackStore.push(req.body.value);
+    res.send();
 });
 
 app.listen(3003, function () {
@@ -170,13 +191,18 @@ popularApi.listen(10003, function () {
 //#region Simulate admin checkups
 
 const { Builder } = require('selenium-webdriver');
-const chrome = require('selenium-webdriver/chrome');
+//const chrome = require('selenium-webdriver/chrome');
+const firefox = require('selenium-webdriver/firefox');
 
 simulateBrowsing = async function () {
-    let driver = await new Builder().forBrowser('chrome')
-        .setChromeOptions(new chrome.Options()
-            .headless()
-            .excludeSwitches('enable-logging'))
+    // let driver = await new Builder().forBrowser('chrome')
+    //     .setChromeOptions(new chrome.Options()
+    //         .headless()
+    //         .excludeSwitches('enable-logging'))
+    //     .build();
+    let driver = await new Builder().forBrowser('firefox')
+        .setFirefoxOptions(new firefox.Options()
+            .headless())
         .build();
     try {
         // Requires to prefetch request
@@ -197,7 +223,7 @@ simulateBrowsing = async function () {
 
 scheduleAdminCheck = function () {
     new Promise(() => {
-        setTimeout(function () { simulateBrowsing().then(); }, 1000);
+        setTimeout(function () { simulateBrowsing().then(); }, 10000);
     });
 };
 

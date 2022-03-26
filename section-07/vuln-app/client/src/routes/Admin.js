@@ -23,14 +23,28 @@ class Admin extends React.Component {
     }
 
     componentDidMount() {
-        this.setState(
-            {
-                feedbacksList: [
-                    Buffer.from('{ time: "2022-32-22", who: "Not Friend", body: "Hackable" }').toString('base64'),
-                    Buffer.from('{ time: "2022-03-24", who: "Author", body: "Good job, remember that git history is crucial when hunting for information disclosure! This time is just a comment from me - but outside of this course it can have credentials or other useful data!" }').toString("base64")
-                ]
-            });
+        this.fetchFeedback();
+        this.fetchAuthorization();
+    }
 
+    fetchFeedback() {
+        const requestOptions = {
+            method: 'GET',
+            credentials: 'include'
+        };
+
+        fetch(
+            "http://localhost:3003/feedbacks", requestOptions)
+            .then((res) => res.json())
+            .then((json) => {
+                this.setState(
+                    {
+                        feedbacksList: json.map(x => Buffer.from(x, 'base64').toString())
+                    })
+            });
+    }
+
+    fetchAuthorization() {
         const requestOptions = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -40,12 +54,11 @@ class Admin extends React.Component {
         fetch(
             "http://localhost:3003/isAdmin", requestOptions)
             .then((res) => {
-                console.log(res.status);
                 this.setState(
                     {
                         isAdmin: res.status === 200
                     })
-            })
+            });
     }
 
     getContent() {
@@ -57,7 +70,7 @@ class Admin extends React.Component {
     getFeedbacks() {
         var feedbacks = []
         for (var fString of this.state.feedbacksList) {
-            var f = eval("(" + Buffer.from(fString, 'base64') + ")");
+            var f = eval("(" + fString + ")");
 
             feedbacks.push(<div><div>{f.who} @ {f.time}</div><div>{f.body}</div></div>);
         }

@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
+sudo npm install -g selenium-webdriver
 
-npm install -g selenium-webdriver
-
-npm --prefix ./client install ./client
-npm --prefix ./server install ./server
+sudo npm --prefix ./client install ./client
+sudo npm --prefix ./server install ./server
