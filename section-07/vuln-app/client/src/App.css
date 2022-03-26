@@ -1,0 +1,42 @@
+header, main, footer {
+    background-color: #282c34;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: calc(10px + 2vmin);
+    color: white;
+}
+
+header, footer {
+    min-height: 10vh;
+}
+
+header {
+    font-size: calc(15px + 2vmin);
+    line-height: calc(15px + 5vmin);
+}
+
+main{
+    min-height: 80vh;
+    display: flex;
+}
+
+footer{
+    display: flex;
+}
+
+footer > *{
+    font-size: calc(1px + 2vmin);
+    margin-left: auto;
+    padding-right: 2em;
+    padding-left: 5em;
+}
+
+a {
+    color: #61dafb;
+}
+
+span.highlight{
+    color:chartreuse;
+    font-family:'Courier New', Courier, monospace;
+}
