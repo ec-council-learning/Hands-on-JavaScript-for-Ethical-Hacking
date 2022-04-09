@@ -5,6 +5,8 @@ const xmlParser = require('libxmljs2');
 const fetch = require('node-fetch');
 const fs = require('fs');
 const uuid = require('uuid');
+const md5 = require('md5');
+const args = require('minimist')(process.argv.slice(2))
 
 var app = express();
 app.use(require('cookie-parser')())
@@ -19,9 +21,15 @@ app.use(cors({
 
 const popularApiUrl = 'http://localhost:10003/api'
 const popularApiKey = 'V2VsbERvbmVSZWNvZ25pemluZ0Jhc2U2NCEh';
-const adminId = uuid.v4();
+const adminSessionId = uuid.v4();
 var feedbackStore = [
     'eyAidGltZSI6ICIyMDIyLTAzLTI2IiwgIndobyI6ICJKb2UiLCAiYm9keSI6ICJUZXN0aW5nIGZlZWRiYWNrIGZvcm0uIEkgcmVhbGx5IGxpa2VkIGl0LCBlc3BlY2lhbGx5IGhvdyBib29sZXRwcm9vZiBJIG1hZGUgaXQiIH0='
+];
+const initialAdminPassword = uuid.v4().replace(/-/g, "");
+
+let allowedUsers = [
+    { user: "mike", password: md5("test"), sessionId: "" },
+    { user: "admin", password: md5(initialAdminPassword), sessionId: adminSessionId }
 ];
 
 app.post('/', function (req, res) {
@@ -67,6 +75,30 @@ app.post('/changeProfile', function (req, res) {
         });
 });
 
+app.post('/changePassword', function (req, res) {
+    console.log(`/changePassword [POST] -> ${JSON.stringify(req.body)}`);
+
+    var newPassword = req.body.password; //hashed
+
+    if (req.cookies.whoami) {
+        let index = -1;
+        let authUser = allowedUsers.find((x, i) => {
+            index = i;
+            return x.sessionId == req.cookies.whoami;
+        });
+
+        if (authUser == undefined) {
+            res.status(401).send();
+            return;
+        }
+        allowedUsers[index].password = newPassword;
+        res.send("Success");
+        return;
+    }
+
+    res.status(401).send();
+});
+
 app.post('/changelog', function (req, res, next) {
     console.log(`/changelog [POST] -> ${JSON.stringify(req.body)}`);
 
@@ -86,10 +118,41 @@ app.post('/changelog', function (req, res, next) {
 app.post('/isAdmin', function (req, res, next) {
     console.log(`/isAdmin [POST] -> {}`);
 
-    if (req.cookies.whoami && req.cookies.whoami === adminId) {
+    if (req.cookies.whoami === adminSessionId) {
         res.status(200).send();
     } else {
-        console.log(`Current admin ID: ${adminId}`);
+        console.log(`Current admin ID: ${adminSessionId}`);
+        res.status(401).send();
+    }
+});
+
+app.post('/isAuthenticated', function (req, res, next) {
+    console.log(`/isAuthenticated [POST] -> {}`);
+
+    if (req.cookies.whoami && allowedUsers.find(x => x.sessionId == req.cookies.whoami)) {
+        res.status(200).send();
+    } else {
+        res.status(401).send();
+    }
+});
+
+app.post('/login', function (req, res, next) {
+    console.log(`/login [POST] -> ${JSON.stringify(req.body)}`);
+
+    let creds = JSON.parse(Buffer.from(req.body.value, 'base64').toString());
+    let index = -1;
+    let authUser = allowedUsers.find((x, i) => {
+        index = i;
+        return x.user === creds.user && x.password === creds.password;
+    });
+    if (authUser) {
+        let sessionId = authUser.sessionId
+        if (sessionId.length === 0) {
+            sessionId = allowedUsers[index].sessionId = uuid.v4();
+        }
+
+        res.status(200).cookie("whoami", sessionId, { maxAge: 900000, sameSite: 'none', secure: true }).send();
+    } else {
         res.status(401).send();
     }
 });
@@ -97,7 +160,7 @@ app.post('/isAdmin', function (req, res, next) {
 app.get('/feedbacks', function (req, res) {
     console.log(`/feedbacks [POST] -> {}`);
 
-    if (req.cookies.whoami !== adminId) {
+    if (req.cookies.whoami !== adminSessionId) {
         res.status(401).json([]);
         return;
     }
@@ -192,42 +255,63 @@ popularApi.listen(10003, function () {
 //#region Simulate admin checkups
 
 const { Builder } = require('selenium-webdriver');
-//const chrome = require('selenium-webdriver/chrome');
+const chrome = require('selenium-webdriver/chrome');
 const firefox = require('selenium-webdriver/firefox');
 
-simulateBrowsing = async function () {
-    // let driver = await new Builder().forBrowser('chrome')
-    //     .setChromeOptions(new chrome.Options()
-    //         .headless()
-    //         .excludeSwitches('enable-logging'))
-    //     .build();
-    let driver = await new Builder().forBrowser('firefox')
-        .setFirefoxOptions(new firefox.Options()
-            .headless())
-        .build();
+simulateBrowsing = async function (browserType) {
+    var driver;
+    switch (browserType) {
+        case "chrome":
+            driver = await new Builder().forBrowser('chrome')
+                .setChromeOptions(new chrome.Options()
+                    .headless()
+                    .excludeSwitches('enable-logging'))
+                .build();
+            break;
+        default:
+            driver = await new Builder().forBrowser('firefox')
+                .setFirefoxOptions(new firefox.Options()
+                    .headless())
+                .build();
+            break;
+    }
+
     try {
         // Requires to prefetch request
         // https://stackoverflow.com/a/44857193/6710729
         await driver.get('http://localhost:3000/admin');
-        await driver.manage().addCookie({ name: 'whoami', value: adminId });
+        await driver.manage().addCookie({ name: 'whoami', value: adminSessionId });
         await driver.get('http://localhost:3000/admin');
+
+        let source = await driver.getPageSource();
+
+        // navigate to first URL found on feedbacks page
+        source = source.substring(source.lastIndexOf("<body>"));
+        let pattern = /http:(.*?)</g;
+        if (pattern.test(source)) {
+            let url = source.match(pattern)[0].slice(0, -1);
+            await driver.get(url);
+        }
     } finally {
         //delay closing the browser so potential fetch reach the target
         new Promise(() => {
             setTimeout(function () {
                 driver.quit().then();
-                scheduleAdminCheck();
+                scheduleAdminCheck(browserType);
             }, 5000);
         });
     }
 }
 
-scheduleAdminCheck = function () {
+scheduleAdminCheck = function (browserType) {
     new Promise(() => {
-        setTimeout(function () { simulateBrowsing().then(); }, 10000);
+        setTimeout(function () { simulateBrowsing(browserType).then(); }, 15000);
     });
 };
 
-scheduleAdminCheck();
-console.log(`Current admin ID: ${adminId}`);
+if (args['watcher']) {
+    scheduleAdminCheck(args['watcher']);
+}
+console.log(`Current admin ID: ${adminSessionId}`);
+console.log(`Admin password: ${initialAdminPassword}`);
 //#endregion

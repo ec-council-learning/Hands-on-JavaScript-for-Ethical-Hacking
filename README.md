@@ -12,3 +12,4 @@ Hands-on JavaScript for Ethical Hacking, by EC-Council. Authored by [Kamil Giera
 |Section 05 | [Vulnerable and Outdated Components (A06:2021)](section-05/) |
 |Section 06 | [Security Misconfiguration (A05:2021)](section-06/) |
 |Section 07 | [Injection (A03:2021)](section-07/) |
+|Section 08 | [Broken Access Control (A01:2021)](section-08/) |
